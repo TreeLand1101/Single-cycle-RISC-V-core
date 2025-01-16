@@ -35,20 +35,39 @@ class ALUControl extends Module {
       )
     }
     is(InstructionTypes.RM) {
-      io.alu_funct := MuxLookup(
-        io.funct3,
-        ALUFunctions.zero,
-        IndexedSeq(
-          InstructionsTypeR.add_sub -> Mux(io.funct7(5), ALUFunctions.sub, ALUFunctions.add),
-          InstructionsTypeR.sll     -> ALUFunctions.sll,
-          InstructionsTypeR.slt     -> ALUFunctions.slt,
-          InstructionsTypeR.sltu    -> ALUFunctions.sltu,
-          InstructionsTypeR.xor     -> ALUFunctions.xor,
-          InstructionsTypeR.or      -> ALUFunctions.or,
-          InstructionsTypeR.and     -> ALUFunctions.and,
-          InstructionsTypeR.sr      -> Mux(io.funct7(5), ALUFunctions.sra, ALUFunctions.srl)
-        ),
-      )
+      when(io.funct7 === "b0000000".U) {
+        io.alu_funct := MuxLookup(
+          io.funct3,
+          ALUFunctions.zero,
+          IndexedSeq(
+            InstructionsTypeR.add_sub -> Mux(io.funct7(5), ALUFunctions.sub, ALUFunctions.add),
+            InstructionsTypeR.sll     -> ALUFunctions.sll,
+            InstructionsTypeR.slt     -> ALUFunctions.slt,
+            InstructionsTypeR.sltu    -> ALUFunctions.sltu,
+            InstructionsTypeR.xor     -> ALUFunctions.xor,
+            InstructionsTypeR.or      -> ALUFunctions.or,
+            InstructionsTypeR.and     -> ALUFunctions.and,
+            InstructionsTypeR.sr      -> Mux(io.funct7(5), ALUFunctions.sra, ALUFunctions.srl)
+          )
+        )
+      }.elsewhen(io.funct7 === "b0000001".U) {
+        io.alu_funct := MuxLookup(
+          io.funct3,
+          ALUFunctions.zero,
+          IndexedSeq(
+            InstructionsTypeM.mul     -> ALUFunctions.mul,
+            InstructionsTypeM.mulh    -> ALUFunctions.mulh,
+            InstructionsTypeM.mulhsu  -> ALUFunctions.mulhsu,
+            InstructionsTypeM.mulhum  -> ALUFunctions.mulhum,
+            InstructionsTypeM.div     -> ALUFunctions.div,
+            InstructionsTypeM.divu    -> ALUFunctions.divu,
+            InstructionsTypeM.rem     -> ALUFunctions.rem,
+            InstructionsTypeM.remu    -> ALUFunctions.remu
+          )
+        )
+      }.otherwise {
+        io.alu_funct := ALUFunctions.zero
+      }
     }
     is(InstructionTypes.B) {
       io.alu_funct := ALUFunctions.add
