@@ -113,3 +113,51 @@ class ByteAccessTest extends AnyFlatSpec with ChiselScalatestTester {
     }
   }
 }
+
+class MultiplyTest extends AnyFlatSpec with ChiselScalatestTester {
+  behavior.of("Arithmetic Operations using M Extension")
+  it should "perform multiplication correctly" in {
+    test(new TestTopModule("quiz2_problem_a.asmbin")).withAnnotations(TestAnnotations.annos) { c =>
+      for (i <- 1 to 50) {
+        c.clock.step(1000)
+        c.io.mem_debug_read_address.poke((i * 4).U) // Avoid timeout
+      }
+
+      c.io.regs_debug_read_address.poke(5.U) // Address of "t0"
+      c.clock.step()
+      c.io.regs_debug_read_data.expect(63.U) // Verify multiplication result
+    }
+  }
+}
+
+class EgyptianMultiplicationTest extends AnyFlatSpec with ChiselScalatestTester {
+  behavior.of("Arithmetic Operations using M Extension")
+  it should "implement Ancient Egyptian multiplication correctly" in {
+    test(new TestTopModule("quiz2_problem_d.asmbin")).withAnnotations(TestAnnotations.annos) { c =>
+      for (i <- 1 to 50) {
+        c.clock.step(1000)
+        c.io.mem_debug_read_address.poke((i * 4).U) // Avoid timeout
+      }
+
+      c.io.regs_debug_read_address.poke(7.U) // Address of "t2"
+      c.clock.step()
+      c.io.regs_debug_read_data.expect(91.U) // Verify multiplication result
+    }
+  }
+}
+
+class SquareTest extends AnyFlatSpec with ChiselScalatestTester {
+  behavior.of("Arithmetic Operations using M Extension")
+  it should "compute the square of a number correctly" in {
+    test(new TestTopModule("quiz4_problem_a.asmbin")).withAnnotations(TestAnnotations.annos) { c =>
+      for (i <- 1 to 50) {
+        c.clock.step(1000)
+        c.io.mem_debug_read_address.poke((i * 4).U) // Avoid timeout
+      }
+
+      c.io.regs_debug_read_address.poke(10.U) // Address of "a0"
+      c.clock.step()
+      c.io.regs_debug_read_data.expect(169.U) // Verify square calculation result
+    }
+  }
+}
